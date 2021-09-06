@@ -1,4 +1,4 @@
-import {FormEvent, useState} from 'react';
+import {FormEvent, useRef, useState} from 'react';
 import Card from '../UI/Card';
 import style from './AddUser.module.css';
 import Button from '../UI/Button';
@@ -7,21 +7,23 @@ import {v4 as uuid} from 'uuid';
 import ErrorModal, {IError} from '../UI/ErrorModal';
 
 function AddUser(props: { addUser: Function }) {
-    const [enteredUsername, setEnteredUsername] = useState('');
-    const [enteredAge, setEnteredAge] = useState('');
+    const usernameInputRef = useRef<HTMLInputElement>(null);
+    const ageInputRef = useRef<HTMLInputElement>(null);
     const [error, setError] = useState<IError | null>();
 
-    const resetForm = () => {
-        setEnteredUsername('');
-        setEnteredAge('');
+    const getUsername = (): string => {
+        return usernameInputRef.current ? usernameInputRef.current.value : '';
     };
 
-    const isValidUsername = () => enteredUsername.trim().length > 0;
-    const isValidAge = () => {
-        return enteredAge.trim().length > 0 &&
-            Number(enteredAge) > 0;
+    const getAge = (): number | null => {
+        return ageInputRef.current ? Number(ageInputRef.current.value) : null;
     };
-    const isValidForm = () => isValidUsername() && isValidAge();
+
+    const isValidUsername = (usernameValue: string) => usernameValue.trim().length > 0;
+    const isValidAge = (ageValue: number | null) => {
+        return ageValue && ageValue > 0;
+    };
+    const isValidForm = (usernameValue: string, ageValue: number | null) => isValidUsername(usernameValue) && isValidAge(ageValue);
 
     const showError = () => {
         const errorProps: IError = {
@@ -31,8 +33,8 @@ function AddUser(props: { addUser: Function }) {
         };
         errorProps.messageChild = (
             <ul>
-                {!isValidUsername() ? <li>Username</li> : ''}
-                {!isValidAge() ? <li>Age</li> : ''}
+                {!isValidUsername(getUsername()) ? <li>Username</li> : ''}
+                {!isValidAge(getAge()) ? <li>Age</li> : ''}
             </ul>
         );
         setError(errorProps);
@@ -40,20 +42,17 @@ function AddUser(props: { addUser: Function }) {
 
     const createUserFromForm = (): IUser => {
         return {
-            username: enteredUsername,
-            age: Number(enteredAge),
+            username: getUsername(),
+            age: Number(getAge()),
             id: uuid()
         };
     };
 
-    const usernameHandler = (event: FormEvent<HTMLInputElement>) => setEnteredUsername(event.currentTarget.value);
-    const ageHandler = (event: FormEvent<HTMLInputElement>) => setEnteredAge(event.currentTarget.value);
-
     const addUserHandler = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (!isValidForm()) return showError();
+        if (!isValidForm(getUsername(), getAge())) return showError();
         props.addUser(createUserFromForm());
-        resetForm();
+        event.currentTarget.reset();
     };
 
     return <>
@@ -61,17 +60,15 @@ function AddUser(props: { addUser: Function }) {
         <Card className={style.input}>
             <form onSubmit={addUserHandler}>
                 <label htmlFor='username'>Username</label>
-                <input type='text'
+                <input ref={usernameInputRef}
+                       type='text'
                        autoComplete='off'
-                       name='username'
-                       value={enteredUsername}
-                       onChange={usernameHandler}/>
+                       name='username'/>
 
                 <label htmlFor='age'>Age</label>
-                <input type='number'
-                       name='age'
-                       value={enteredAge}
-                       onChange={ageHandler}/>
+                <input ref={ageInputRef}
+                       type='number'
+                       name='age'/>
                 <Button type='submit'>Add User</Button>
             </form>
         </Card>
