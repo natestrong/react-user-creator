@@ -1,18 +1,19 @@
 import style from './ErrorModule.module.css';
 import Card from './Card';
 import Button from './Button';
-import {ReactElement} from 'react';
+import {MouseEventHandler, ReactElement} from 'react';
 
 export interface IError {
     title: string;
     message: string;
     messageChildren?: ReactElement[];
-    onOkay: Function;
+    onConfirmed: MouseEventHandler<HTMLDivElement>;
 }
 
 function ErrorModal(props: IError) {
     return <>
-        <div className={style.backdrop}/>
+        <div className={style.backdrop}
+             onClick={props.onConfirmed}/>
         <Card className={style.modal}>
 
             <header className={style.header}>
@@ -27,7 +28,7 @@ function ErrorModal(props: IError) {
             </div>
 
             <footer className={style.actions}>
-                <Button onClick={props.onOkay}>Okay</Button>
+                <Button onClick={props.onConfirmed}>Okay</Button>
             </footer>
         </Card>
     </>;

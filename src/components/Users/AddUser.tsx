@@ -27,7 +27,7 @@ function AddUser(props: { addUser: Function }) {
         const errorProps: IError = {
             title: 'Invalid Input',
             message: 'The following fields are missing or are invalid:',
-            onOkay: () => setError(null)
+            onConfirmed: () => setError(null)
         };
         errorProps.messageChildren = (
             [<ul key={'1'}>
