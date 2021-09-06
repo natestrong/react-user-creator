@@ -29,11 +29,11 @@ function AddUser(props: { addUser: Function }) {
             message: 'The following fields are missing or are invalid:',
             onConfirmed: () => setError(null)
         };
-        errorProps.messageChildren = (
-            [<ul key={'1'}>
+        errorProps.messageChild = (
+            <ul>
                 {!isValidUsername() ? <li>Username</li> : ''}
                 {!isValidAge() ? <li>Age</li> : ''}
-            </ul>]
+            </ul>
         );
         setError(errorProps);
     };

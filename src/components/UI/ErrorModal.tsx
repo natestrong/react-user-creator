@@ -6,7 +6,7 @@ import {MouseEventHandler, ReactElement} from 'react';
 export interface IError {
     title: string;
     message: string;
-    messageChildren?: ReactElement[];
+    messageChild?: ReactElement;
     onConfirmed: MouseEventHandler<HTMLDivElement>;
 }
 
@@ -23,7 +23,7 @@ function ErrorModal(props: IError) {
             <div className={style.content}>
                 <div>
                     <p>{props.message}</p>
-                    {props.messageChildren && props.messageChildren}
+                    {props.messageChild && props.messageChild}
                 </div>
             </div>
 
